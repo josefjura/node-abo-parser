@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { ABOHeaderParser, Parser, GroupHeaderParser, FileHeaderParser, RecordParser } from '../classes'
+import { ABOHeaderParser, Parser, GroupHeaderParser, FileHeaderParser, RecordParser } from '../src/classes'
 
 describe('Row', () => {
     describe('by size', () => {
