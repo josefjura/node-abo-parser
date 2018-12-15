@@ -1,47 +1,51 @@
-export class Row {
+export class Parser {
     rawData = [];
     position = 0;
-    readByLength(value, length) {
-        if (!value || value === '') throw new Error("EMPTY");
+    start(line){
+        this.value = line;
+        this.position = 0;
+    }
+    readByLength(length) {
+        if (!this.value || this.value === '') throw new Error("EMPTY");
         if (length < 1) throw new Error("BAD_LENGTH");
-        if (value.length + this.position < length) throw new Error("TOO_LONG");
+        if (this.value.length + this.position < length) throw new Error("TOO_LONG");
         //console.log(`Reading from: ${value}, position: ${this.position}, length: ${length}`);
-        this.rawData.push(value.substr(this.position, length));
+        this.rawData.push(this.value.substr(this.position, length));
         this.position += length;
     }
     skip(length){
         this.position += length;
     }
-    readByDelimiter(value, delimiter) {
-        if (!value || value === '') throw new Error("EMPTY");
+    readByDelimiter(delimiter) {
+        if (!this.value || this.value === '') throw new Error("EMPTY");
         if (!delimiter) throw new Error("BAD_DELIMITER");
 
-        var delIndex = value.indexOf(delimiter, this.position);
+        var delIndex = this.value.indexOf(delimiter, this.position);
 
         if (delIndex == -1) {
-            var partial = value.substr(this.position);
+            var partial = this.value.substr(this.position);
             this.rawData.push(partial);
             //console.log(`Reading to end: ${value}, position: ${this.position}, delIndex: ${delIndex}, partial: "${partial}"`);
-            this.position = value.length;
+            this.position = this.value.length;
         } else {
             delIndex += delimiter.length;
-            var partial = value.substr(this.position, delIndex - this.position - 1);
+            var partial = this.value.substr(this.position, delIndex - this.position - 1);
             //console.log(`Reading from: ${value}, position: ${this.position}, delIndex: ${delIndex}, partial: "${partial}"`);
             this.rawData.push(partial);
             this.position = delIndex;
         }
     }
 
-    readToEnd(value) {
-        if (!value || value === '') throw new Error("EMPTY");
+    readToEnd() {
+        if (!this.value || this.value === '') throw new Error("EMPTY");
 
         //console.log(`Reading to end: ${value}, position: ${this.position}`);
-        this.rawData.push(value.substr(this.position));
-        this.position = value.length;
+        this.rawData.push(this.value.substr(this.position));
+        this.position = this.value.length;
     }
 }
 
-export class ABOHeader extends Row {
+export class ABOHeaderParser extends Parser {
     get datum(){
         return this.rawData[1];
     }
@@ -58,9 +62,9 @@ export class ABOHeader extends Row {
 
         if (!line) throw Error("EMPTY HEADER");
         if (line.length != this.length) throw Error("BAD HEADER LENGTH");
-
+        this.start(line);
         for (const el of this.elements) {
-            this.readByLength(line, el);
+            this.readByLength(el);
         }
     }
 
@@ -69,7 +73,7 @@ export class ABOHeader extends Row {
     }
 }
 
-export class FileHeader extends Row {
+export class FileHeaderParser extends Parser {
     get druh(){
         return this.rawData[1];
     }
@@ -86,12 +90,13 @@ export class FileHeader extends Row {
     parse(line){
         if (!line) throw Error("EMPTY HEADER");
 
-        this.readByDelimiter(line, ' ');
-        this.readByDelimiter(line, ' ');
-        this.readByLength(line, 3);
-        this.readByLength(line, 3);
+        this.start(line)
+        this.readByDelimiter(' ');
+        this.readByDelimiter(' ');
+        this.readByLength(3);
+        this.readByLength(3);
         this.skip(1);
-        this.readToEnd(line);
+        this.readToEnd();
     }
 
     static equals(line) {
@@ -99,7 +104,7 @@ export class FileHeader extends Row {
     }
 }
 
-export class GroupHeader extends Row {
+export class GroupHeaderParser extends Parser {
 
     get prikazce(){
         return this.rawData[1];
@@ -114,10 +119,11 @@ export class GroupHeader extends Row {
     parse(line){
         if (!line) throw Error("EMPTY HEADER");
 
-        this.readByDelimiter(line, ' ');
-        this.readByDelimiter(line, ' ');
-        this.readByDelimiter(line, ' ');
-        this.readToEnd(line);
+        this.start(line);
+        this.readByDelimiter(' ');
+        this.readByDelimiter(' ');
+        this.readByDelimiter(' ');
+        this.readToEnd();
     }
 
     static equals(line) {
@@ -125,7 +131,7 @@ export class GroupHeader extends Row {
     }
 }
 
-export class Record extends Row {
+export class RecordParser extends Parser {
     // protistrana castka vsym bank ksym
     get protistrana(){
         return this.rawData[0];
@@ -146,11 +152,12 @@ export class Record extends Row {
     parse(line){
         if (!line) throw Error("EMPTY HEADER");
 
-        this.readByDelimiter(line, ' ');
-        this.readByDelimiter(line, ' ');
-        this.readByDelimiter(line, ' ');
-        this.readByLength(line, 4);
-        this.readByLength(line, 4);
+        this.start(line)
+        this.readByDelimiter(' ');
+        this.readByDelimiter(' ');
+        this.readByDelimiter(' ');
+        this.readByLength(4);
+        this.readByLength(4);
     }
 
     static equals(line) {
