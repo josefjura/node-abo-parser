@@ -11,6 +11,9 @@
     "go": "npm run build && npm run start",
     "go:run": "npm run build && npm run start:run"
   },
+  "repository": {
+    "url": "https://github.com/josefjura/node-abo-parser"
+  },
   "author": "Josef Jura",
   "license": "MIT",
   "devDependencies": {
