@@ -7,7 +7,9 @@
     "test": "mocha --require @babel/register",
     "build": "babel src --out-dir dist",
     "start": "node dist/index.js",
-    "go": "npm run build && npm run start"
+    "start:run": "node dist/runner.js",
+    "go": "npm run build && npm run start",
+    "go:run": "npm run build && npm run start:run"
   },
   "author": "Josef Jura",
   "license": "MIT",

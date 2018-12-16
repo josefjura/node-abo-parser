@@ -37,7 +37,3 @@ function parse(text) {
   result.push(rp.rawData);
   return result;
 }
-
-parseFile("./examples/example1.KPC").then(function (data) {
-  console.log(data);
-});

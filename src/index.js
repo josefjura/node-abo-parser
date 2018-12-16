@@ -32,7 +32,3 @@ var result = [];
 
     return result;
 }
-
-parseFile("./examples/example1.KPC").then((data) => {
-    console.log(data);
-});
