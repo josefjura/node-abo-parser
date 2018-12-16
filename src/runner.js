@@ -1,5 +1,5 @@
 import { parseFile } from './index'
 
-parseFile("./examples/example1.KPC").then((data) => {
+parseFile(process.argv[2]).then((data) => {
     console.log(data);
 });
